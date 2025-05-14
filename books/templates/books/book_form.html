@@ -1,0 +1,58 @@
+{% extends 'books/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit {{ form.instance.title }}{% else %}Add Book{% endif %}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">
+        {% if form.instance.pk %}Edit Book{% else %}Add New Book{% endif %}
+    </h1>
+    
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="mb-4">
+            <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold mb-2">
+                {{ field.label }}
+            </label>
+            
+            {% if field.name == 'description' %}
+            <textarea 
+                name="{{ field.name }}" 
+                id="{{ field.id_for_label }}" 
+                class="w-full px-3 py-2 border {% if field.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="4"
+            >{{ field.value|default:'' }}</textarea>
+            {% else %}
+            <input 
+                type="{% if field.name == 'publication_date' %}date{% else %}text{% endif %}" 
+                name="{{ field.name }}" 
+                id="{{ field.id_for_label }}" 
+                value="{{ field.value|default:'' }}"
+                class="w-full px-3 py-2 border {% if field.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+            {% endif %}
+            
+            {% if field.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
+            {% endif %}
+            
+            {% if field.help_text %}
+            <p class="text-gray-500 text-sm mt-1">{{ field.help_text }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <div class="flex gap-4 mt-6">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                {% if form.instance.pk %}Update Book{% else %}Add Book{% endif %}
+            </button>
+            <a href="{% if form.instance.pk %}{% url 'books:book_detail' pk=form.instance.pk %}{% else %}{% url 'books:book_list' %}{% endif %}" 
+                class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %} 
